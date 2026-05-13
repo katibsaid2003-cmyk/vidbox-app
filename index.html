@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+  <meta name="theme-color" content="#0f0f0f">
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="apple-mobile-web-app-title" content="VidBox">
+  <link rel="manifest" href="manifest.json">
+  <link rel="apple-touch-icon" href="icon-192.png">
+  <title>VidBox</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    html, body { width: 100%; height: 100%; overflow: hidden; background: #0f0f0f; }
+    iframe {
+      width: 100%;
+      height: 100%;
+      border: none;
+      display: block;
+    }
+    #splash {
+      position: fixed; inset: 0;
+      background: #0f0f0f;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      z-index: 999;
+      gap: 20px;
+      transition: opacity 0.5s ease;
+    }
+    #splash svg { width: 80px; height: 80px; }
+    #splash h1 {
+      color: #fff;
+      font-family: -apple-system, sans-serif;
+      font-size: 1.8rem;
+      font-weight: 700;
+      letter-spacing: 1px;
+    }
+    .loader {
+      width: 40px; height: 40px;
+      border: 3px solid rgba(255,255,255,0.1);
+      border-top-color: #fff;
+      border-radius: 50%;
+      animation: spin 0.8s linear infinite;
+    }
+    @keyframes spin { to { transform: rotate(360deg); } }
+  </style>
+</head>
+<body>
+
+  <!-- Splash Screen -->
+  <div id="splash">
+    <svg viewBox="0 0 80 80" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <rect width="80" height="80" rx="18" fill="#1a1a2e"/>
+      <rect x="8" y="8" width="64" height="64" rx="12" fill="#16213e"/>
+      <polygon points="30,22 62,40 30,58" fill="#e94560"/>
+      <rect x="10" y="62" width="60" height="4" rx="2" fill="#e94560" opacity="0.3"/>
+    </svg>
+    <h1>VidBox</h1>
+    <div class="loader"></div>
+  </div>
+
+  <!-- The actual website in a full-screen iframe -->
+  <iframe
+    id="frame"
+    src="https://vidbox.dev/"
+    allowfullscreen
+    allow="autoplay; fullscreen; picture-in-picture; clipboard-write"
+    onload="hideSplash()"
+  ></iframe>
+
+  <script>
+    // Hide splash after load
+    function hideSplash() {
+      const splash = document.getElementById('splash');
+      splash.style.opacity = '0';
+      setTimeout(() => splash.style.display = 'none', 500);
+    }
+
+    // Fallback: hide splash after 4s even if iframe is slow
+    setTimeout(hideSplash, 4000);
+
+    // Register service worker
+    if ('serviceWorker' in navigator) {
+      navigator.serviceWorker.register('sw.js')
+        .then(() => console.log('SW registered'))
+        .catch(err => console.log('SW error:', err));
+    }
+  </script>
+</body>
+</html>
